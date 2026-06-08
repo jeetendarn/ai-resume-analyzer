@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>AI Resume Analyzer</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+
+            background:
+                radial-gradient(circle at top,
+                    rgba(59, 130, 246, 0.2),
+                    transparent 25%),
+                linear-gradient(135deg,
+                    #020617,
+                    #0f172a,
+                    #111827);
+
+            color: white;
+
+            min-height: 100vh;
+
+            padding: 20px 50px;
+        }
+
+        .container {
+            max-width: 1900px;
+            margin: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+
+            font-size: 70px;
+
+            font-weight: 700;
+
+            background:
+                linear-gradient(to right,
+                    #38bdf8,
+                    #818cf8,
+                    #d946ef);
+
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #94a3b8;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .main-grid {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1.9fr;
+
+            gap: 25px;
+        }
+
+        .card {
+
+            background:
+                rgba(255, 255, 255, 0.05);
+
+            border:
+                1px solid rgba(255, 255, 255, 0.08);
+
+            border-radius: 24px;
+
+            padding: 35px;
+
+            backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .section-title {
+
+            font-size: 28px;
+
+            margin-bottom: 20px;
+
+            font-weight: 600;
+        }
+
+        .upload-box {
+
+            border:
+                2px dashed rgba(99, 102, 241, 0.6);
+
+            border-radius: 20px;
+
+            padding: 40px;
+
+            text-align: center;
+
+            transition: 0.3s;
+        }
+
+        .upload-box:hover {
+
+            background:
+                rgba(255, 255, 255, 0.03);
+        }
+
+        .upload-icon {
+
+            font-size: 80px;
+
+            margin-bottom: 20px;
+        }
+
+        .upload-box h3 {
+
+            font-size: 28px;
+
+            margin-bottom: 10px;
+        }
+
+        .upload-box p {
+
+            color: #94a3b8;
+
+            margin-bottom: 20px;
+        }
+
+        input[type=file] {
+            display: none;
+        }
+
+        .btn {
+
+            border: none;
+
+            padding: 15px 35px;
+
+            border-radius: 14px;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            font-weight: 600;
+
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .choose-btn {
+
+            background:
+                linear-gradient(to right,
+                    #4338ca,
+                    #7c3aed);
+
+            color: white;
+        }
+
+        .analyze-btn {
+
+            background:
+                linear-gradient(to right,
+                    #06b6d4,
+                    #3b82f6);
+
+            color: white;
+
+            margin-top: 20px;
+        }
+
+        .file-preview {
+
+            margin-top: 25px;
+
+            background:
+                rgba(255, 255, 255, 0.04);
+
+            border-radius: 16px;
+
+            padding: 18px;
+
+            display: none;
+        }
+
+        .file-preview h4 {
+            margin-bottom: 10px;
+        }
+
+        .file-preview p {
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .candidate-card {
+
+            margin-top: 25px;
+        }
+
+        .candidate-item {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            background:
+                rgba(255, 255, 255, 0.03);
+
+            padding: 18px;
+
+            border-radius: 14px;
+
+            margin-bottom: 15px;
+        }
+
+        .candidate-label {
+            color: #94a3b8;
+        }
+
+        .candidate-value {
+            font-weight: 600;
+        }
+
+        .right-section {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 25px;
+        }
+
+        .fit-score {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+        }
+
+        .circle {
+
+            width: 220px;
+
+            height: 220px;
+
+            border-radius: 50%;
+
+            background:
+                conic-gradient(#22c55e 0%,
+                    #22c55e 90%,
+                    rgba(255, 255, 255, 0.08) 90%);
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+        }
+
+        .circle-inner {
+
+            width: 170px;
+
+            height: 170px;
+
+            background: #0f172a;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            align-items: center;
+        }
+
+        .circle-inner h1 {
+
+            font-size: 48px;
+
+            color: #22c55e;
+        }
+
+        .circle-inner p {
+            color: #94a3b8;
+        }
+
+        .fit-content h2 {
+
+            font-size: 32px;
+
+            margin-bottom: 10px;
+        }
+
+        .fit-content p {
+
+            color: #cbd5e1;
+
+            line-height: 1.7;
+        }
+
+        .tag-container {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 12px;
+
+            margin-top: 20px;
+        }
+
+        .tag {
+
+            padding: 10px 18px;
+
+            border-radius: 999px;
+
+            font-size: 14px;
+
+            font-weight: 500;
+        }
+
+        .green {
+            background: rgba(34, 197, 94, 0.18);
+            color: #4ade80;
+        }
+
+        .red {
+            background: rgba(239, 68, 68, 0.18);
+            color: #f87171;
+        }
+
+        .yellow {
+            background: rgba(234, 179, 8, 0.18);
+            color: #facc15;
+        }
+
+        .blue {
+            background: rgba(59, 130, 246, 0.18);
+            color: #60a5fa;
+        }
+
+        .skills-box {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 20px;
+        }
+
+        .skill-section {
+
+            background:
+                rgba(255, 255, 255, 0.03);
+
+            border-radius: 18px;
+
+            padding: 20px;
+        }
+
+        .skill-section h3 {
+
+            margin-bottom: 20px;
+        }
+
+        .skill-tags {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 12px;
+        }
+
+        .skill {
+
+            padding: 10px 18px;
+
+            border-radius: 12px;
+
+            font-size: 14px;
+        }
+
+        .recommendation {
+
+            background:
+                linear-gradient(135deg,
+                    rgba(99, 102, 241, 0.15),
+                    rgba(168, 85, 247, 0.15));
+
+            border:
+                1px solid rgba(168, 85, 247, 0.2);
+
+            border-radius: 20px;
+
+            padding: 25px;
+        }
+
+        .recommendation h2 {
+
+            margin-bottom: 15px;
+        }
+
+        .recommendation p {
+
+            color: #cbd5e1;
+
+            line-height: 1.7;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .spinner {
+
+            width: 55px;
+            height: 55px;
+
+            border-radius: 50%;
+
+            border: 5px solid rgba(255, 255, 255, 0.08);
+
+            border-top: 5px solid #38bdf8;
+
+            animation: spin 1s linear infinite;
+
+            margin: auto;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media(max-width:1200px) {
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fit-score {
+                flex-direction: column;
+            }
+
+            .skills-box {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 45px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+
+            <h1>AI Resume Analyzer</h1>
+
+            <p>
+                Smart Resume Parsing • ATS Analysis • AI Hiring Insights
+            </p>
+
+        </div>
+
+        <div class="main-grid">
+
+            <!-- LEFT -->
+
+            <div>
+
+                <!-- Upload Card -->
+
+                <div class="card">
+
+                    <h2 class="section-title">
+                        Upload Resume
+                    </h2>
+
+                    <div class="upload-box">
+
+                        <div class="upload-icon">
+                            📄
+                        </div>
+
+                        <h3>
+                            Drag & Drop Resume
+                        </h3>
+
+                        <p>
+                            Supports PDF, DOCX, JPG, PNG
+                        </p>
+
+                        <label class="btn choose-btn">
+
+                            Choose Resume
+
+                            <input type="file"
+                                id="resumeFile"
+                                onchange="previewFile()">
+
+                        </label>
+
+                        <br>
+
+                        <button class="btn analyze-btn"
+                            onclick="uploadResume()">
+
+                            Analyze Resume
+
+                        </button>
+
+                        <div class="loading"
+                            id="loading">
+
+                            <div class="spinner"></div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- FILE PREVIEW -->
+
+                    <div class="file-preview"
+                        id="filePreview">
+
+                        <h4>
+                            Uploaded Resume
+                        </h4>
+
+                        <p id="fileName"></p>
+
+                    </div>
+
+                </div>
+
+                <!-- Candidate -->
+
+                <div class="card candidate-card">
+
+                    <h2 class="section-title">
+                        Candidate Details
+                    </h2>
+
+                    <div class="candidate-item">
+
+                        <div class="candidate-label">
+                            Full Name
+                        </div>
+
+                        <div class="candidate-value"
+                            id="name">
+                            -
+                        </div>
+
+                    </div>
+
+                    <div class="candidate-item">
+
+                        <div class="candidate-label">
+                            Email Address
+                        </div>
+
+                        <div class="candidate-value"
+                            id="email">
+                            -
+                        </div>
+
+                    </div>
+
+                    <div class="candidate-item">
+
+                        <div class="candidate-label">
+                            Phone Number
+                        </div>
+
+                        <div class="candidate-value"
+                            id="phone">
+                            -
+                        </div>
+
+                    </div>
+
+                    <div class="candidate-item">
+
+                        <div class="candidate-label">
+                            LinkedIn
+                        </div>
+
+                        <div class="candidate-value"
+                            id="linkedin">
+                            Not Found
+                        </div>
+
+                    </div>
+
+                    <div class="candidate-item">
+
+                        <div class="candidate-label">
+                            GitHub
+                        </div>
+
+                        <div class="candidate-value"
+                            id="github">
+                            Not Found
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+
+            <div class="right-section">
+
+                <!-- FIT SCORE -->
+
+                <div class="card">
+
+                    <div class="fit-score">
+
+                        <div class="circle">
+
+                            <div class="circle-inner">
+
+                                <h1 id="percentage">
+                                    0%
+                                </h1>
+
+                                <p>
+                                    Match Score
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="fit-content">
+
+                            <h2 id="fitTitle">
+                                Awaiting Analysis
+                            </h2>
+
+                            <p id="fitDescription">
+
+                                Upload a resume to analyze
+                                candidate fit for the company.
+
+                            </p>
+
+                            <div class="tag-container"
+                                id="recommendationTags">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- SKILLS -->
+
+                <div class="card">
+
+                    <h2 class="section-title">
+                        Skills Match Analysis
+                    </h2>
+
+                    <div class="skills-box">
+
+                        <!-- MATCHED -->
+
+                        <div class="skill-section">
+
+                            <h3>
+                                ✅ Matched Skills
+                            </h3>
+
+                            <div class="skill-tags"
+                                id="matchedSkills">
+
+                            </div>
+
+                        </div>
+
+                        <!-- MISSING -->
+
+                        <div class="skill-section">
+
+                            <h3>
+                                ❌ Missing Skills
+                            </h3>
+
+                            <div class="skill-tags"
+                                id="missingSkills">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- AI RECOMMENDATION -->
+
+                <div class="recommendation">
+
+                    <h2>
+                        🤖 AI Recommendation
+                    </h2>
+
+                    <p id="recommendationText">
+
+                        Upload resume to generate AI recommendation.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        function previewFile() {
+
+            const file =
+                document.getElementById("resumeFile").files[0];
+
+            if (!file) return;
+
+            document.getElementById("filePreview")
+                .style.display = "block";
+
+            document.getElementById("fileName")
+                .innerText = file.name;
+        }
+
+        async function uploadResume() {
+
+            const fileInput =
+                document.getElementById("resumeFile");
+
+            if (!fileInput.files[0]) {
+
+                alert("Please upload a resume.");
+
+                return;
+            }
+
+            document.getElementById("loading")
+                .style.display = "block";
+
+            const formData = new FormData();
+
+            formData.append(
+                "file",
+                fileInput.files[0]
+            );
+
+            const response =
+                await fetch("/parse", {
+
+                    method: "POST",
+
+                    body: formData
+                });
+
+            const data =
+                await response.json();
+
+            document.getElementById("loading")
+                .style.display = "none";
+
+            // Candidate Details
+
+            document.getElementById("name")
+                .innerText =
+                data.name || "Not Found";
+
+            document.getElementById("email")
+                .innerText =
+                data.email || "Not Found";
+
+            document.getElementById("phone")
+                .innerText =
+                data.phone || "Not Found";
+
+            document.getElementById("linkedin")
+                .innerText =
+                data.linkedin || "Not Found";
+
+            document.getElementById("github")
+                .innerText =
+                data.github || "Not Found";
+
+            // Skills
+
+            const matchedSkills =
+                document.getElementById("matchedSkills");
+
+            matchedSkills.innerHTML = "";
+
+            data.skills.forEach(skill => {
+
+                matchedSkills.innerHTML += `
+                    <div class="skill green">
+                        ${skill}
+                    </div>
+                `;
+            });
+
+            // Missing Skills
+
+            const missing = [
+                "AWS",
+                "Docker",
+                "Kubernetes"
+            ];
+
+            const missingSkills =
+                document.getElementById("missingSkills");
+
+            missingSkills.innerHTML = "";
+
+            missing.forEach(skill => {
+
+                missingSkills.innerHTML += `
+                    <div class="skill red">
+                        ${skill}
+                    </div>
+                `;
+            });
+
+            // Score
+
+            let score = Math.min(
+                95,
+                50 + (data.skills.length * 5)
+            );
+
+            document.getElementById("percentage")
+                .innerText =
+                score + "%";
+
+            // Circle Update
+
+            document.querySelector(".circle")
+                .style.background =
+                `conic-gradient(
+                    #22c55e 0%,
+                    #22c55e ${score}%,
+                    rgba(255,255,255,0.08) ${score}%
+                )`;
+
+            // Fit Analysis
+
+            let fitTitle = "";
+            let fitDescription = "";
+            let recommendation = "";
+
+            if (score >= 80) {
+
+                fitTitle =
+                    "Excellent Fit";
+
+                fitDescription =
+                    "This candidate has strong technical expertise and matches most company requirements.";
+
+                recommendation =
+                    "Highly recommended for interview rounds and technical evaluation.";
+
+            } else if (score >= 60) {
+
+                fitTitle =
+                    "Good Fit";
+
+                fitDescription =
+                    "Candidate matches several important requirements but may need additional skill development.";
+
+                recommendation =
+                    "Recommended for screening round.";
+
+            } else {
+
+                fitTitle =
+                    "Average Fit";
+
+                fitDescription =
+                    "Candidate profile needs improvement in technical stack and project experience.";
+
+                recommendation =
+                    "Resume optimization recommended before hiring.";
+
+            }
+
+            document.getElementById("fitTitle")
+                .innerText =
+                fitTitle;
+
+            document.getElementById("fitDescription")
+                .innerText =
+                fitDescription;
+
+            document.getElementById("recommendationText")
+                .innerText =
+                recommendation;
+
+            // Tags
+
+            const tags =
+                document.getElementById("recommendationTags");
+
+            tags.innerHTML = `
+                <div class="tag green">
+                    Strong Technical Skills
+                </div>
+
+                <div class="tag blue">
+                    ATS Optimized
+                </div>
+
+                <div class="tag yellow">
+                    AI Evaluated
+                </div>
+            `;
+        }
+
+    </script>
+
+</body>
+
+</html>

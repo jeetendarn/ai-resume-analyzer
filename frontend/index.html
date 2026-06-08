@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume Parser</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        pre {
+            background: #eee;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Resume Parser</h1>
+
+        <input type="file" id="resumeFile"/>
+        <button onclick="uploadResume()">Parse Resume</button>
+
+        <h3>Output</h3>
+
+        <pre id="result"></pre>
+    </div>
+
+    <script>
+        async function uploadResume() {
+            const fileInput = document.getElementById("resumeFile");
+
+            const formData = new FormData();
+
+            formData.append("file", fileInput.files[0]);
+
+            const response = await fetch("http://localhost:8000/parse", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            document.getElementById("result").innerText =
+                JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>
